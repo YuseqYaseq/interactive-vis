@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import dash_html_components as html
 import dash_core_components as dcc
 from dash import dependencies
@@ -10,6 +12,11 @@ html_elements = []
 
 data = Cursor()
 fig1 = px.pie(names=['m, 0', 'm, 1', 'f, 0', 'f, 1'], values=data.get2())
+barchart = px.bar(
+    x=['NIE', 'TAK'],
+    y=data.get4(['January', 'February', 'March', 'April', 'June', 'July'], ['MAZOWIECKIE']),
+    title='Czy działalność kontynuowano nieprzerwanie przez okres 12 miesięcy?'
+)
 html_elements.append(html.Div([
     dcc.Graph(
         id='graph1',
@@ -35,7 +42,56 @@ html_elements.append(html.Div([
         },
     ),
     html.Button('0', id='button0', n_clicks=0),
-    dcc.Graph(figure=fig1)
+    dcc.Graph(figure=fig1),
+    dcc.Dropdown(
+        id='month-dropdown',
+        options=[
+            {'label': 'Styczeń', 'value': 'January'},
+            {'label': 'Luty', 'value': 'February'},
+            {'label': 'Marzec', 'value': 'March'},
+            {'label': 'Kwiecień', 'value': 'April'},
+            {'label': 'Maj', 'value': 'May'},
+            {'label': 'Czerwiec', 'value': 'June'},
+            {'label': 'Lipiec', 'value': 'July'},
+            {'label': 'Sierpień', 'value': 'August'},
+            {'label': 'Wrzesień', 'value': 'September'},
+            {'label': 'Październik', 'value': 'October'},
+            {'label': 'Listopad', 'value': 'November'},
+            {'label': 'Grudzień', 'value': 'December'}
+        ],
+        value=['January', 'February', 'March', 'April', 'June', 'July'],
+        multi=True
+    ),
+    dcc.Dropdown(
+        id='voivodeship-dropdown',
+        options=[
+            {'label': 'dolnośląskie', 'value': 'DOLNOŚLĄSKIE'},
+            {'label': 'kujawsko-pomorskie', 'value': 'KUJAWSKO-POMORSKIE'},
+            {'label': 'lubelskie', 'value': 'LUBELSKIE'},
+            {'label': 'lubuskie', 'value': 'LUBUSKIE'},
+            {'label': 'łódzkie', 'value': 'ŁÓDZKIE'},
+            {'label': 'małopolskie', 'value': 'MAŁOPOLSKIE'},
+            {'label': 'mazowieckie', 'value': 'MAZOWIECKIE'},
+            {'label': 'opolskie', 'value': 'OPOLSKIE'},
+            {'label': 'podkarpackie', 'value': 'PODKARPACKIE'},
+            {'label': 'podlaskie', 'value': 'PODLASKIE'},
+            {'label': 'pomorskie', 'value': 'POMORSKIE'},
+            {'label': 'śląskie', 'value': 'ŚLĄSKIE'},
+            {'label': 'świętokrzyskie', 'value': 'ŚWIĘTOKRZYSKIE'},
+            {'label': 'warmińsko-mazurskie', 'value': 'WARMIŃSKO-MAZURSKIE'},
+            {'label': 'wielkopolskie', 'value': 'WIELKOPOLSKIE'},
+            {'label': 'zachodniopomorskie', 'value': 'ZACHODNIOPOMORSKIE'},
+        ],
+        value=['MAZOWIECKIE'],
+        multi=True
+    ),
+    html.Ul([
+        html.Li("aaa"),
+        html.Li("bbb")
+    ]),
+    dcc.Graph(
+        id='graph2',
+        figure=barchart)
 ],))
 
 
@@ -73,4 +129,20 @@ def update_graph(b0):
             hovermode='closest'
         )
     }
+
+@app.callback(
+    dependencies.Output('graph2', 'figure'),
+    [
+        dependencies.Input('month-dropdown', 'value'),
+        dependencies.Input('voivodeship-dropdown', 'value')
+    ]
+)
+def update_barchart(month_value, voivod_value):
+    new_barchart = px.bar(
+        x=['NIE', 'TAK'],
+        y=data.get4(month_value, voivod_value),
+        title='Czy działalność kontynuowano nieprzerwanie przez okres 12 miesięcy?'
+    )
+    return new_barchart
+
 
