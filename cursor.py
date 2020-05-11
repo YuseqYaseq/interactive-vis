@@ -17,6 +17,9 @@ class Cursor:
                self.df.query("Sex=='F' and Target=='0'").count()['Target'],\
                self.df.query("Sex=='F' and Target=='1'").count()['Target']
 
+    def get_df(self):
+        return self.df
+
 
 if __name__ == '__main__':
     pd.set_option('display.max_columns', None)
