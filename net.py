@@ -12,8 +12,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.metrics import confusion_matrix
 
-from cursor import Cursor
-from utils import evaluate
+from cursor import cursor
 
 
 class DenseTransformer(BaseEstimator, TransformerMixin):
@@ -71,7 +70,7 @@ def build_pipeline():
         ("classifier", KerasRegressor(build_fn=create_model,
                                       verbose=1,
                                       epochs=2,
-                                      class_weight={0: 86, 1:14}))
+                                      class_weight={0: 86, 1: 14}))
     ])
     return pipeline
 
@@ -79,7 +78,7 @@ def build_pipeline():
 def get_statistics():
     RANDOM_SEED = 42
     np.random.seed(RANDOM_SEED)
-    data = Cursor().get_df()
+    data = cursor.get_df()
 
     x_train, x_test, y_train, y_test = train_test_split(data.drop("Target", axis=1), data["Target"],
                                                         random_state=RANDOM_SEED)
@@ -90,11 +89,6 @@ def get_statistics():
     pipeline.fit(x_train, y_train)
     output = pipeline.predict(x_test)
     pred_y = np.argmax(output, axis=1)
-
-    # TODO throw away - it's just to increase the variance until the pipeline is fixed
-    #for i in range(15):
-    #    pred_y[i] = abs(pred_y[i] - 1)
-
 
     cm = confusion_matrix(pred_y, y_test)
     return data, x_test, pred_y, output, y_test, cm

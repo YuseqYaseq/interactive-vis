@@ -8,6 +8,7 @@ from dash.dependencies import Output, Input
 
 from net import get_statistics
 from app import app
+from cursor import cursor
 
 html_elements = []
 
@@ -44,7 +45,6 @@ def get_scatter_figure(x, col1, col2):
 
 def add():
     # confusion matrix
-    # [0, 0, 1, 1, 0, 1, 0, 0], [0, 0, 1, 1, 0, 1, 0, 0], [[230, 3], [13, 40]]
     data, x_test, pred_y, output, y_test, cm = get_statistics()
     cm = [['', 'Predicted False', 'Predicted True'],
           ['Actual False', cm[0][0], cm[0][1]],
@@ -75,6 +75,22 @@ def add():
                                                           hover_name=['temp_name' for i, _ in enumerate(pred_error)]),
                                             style={'height': 450})))
 
+    fig = px.choropleth_mapbox(cursor.get_target_per_voivodeship(),
+                               geojson=cursor.get_map(),
+                               locations='MainAddressVoivodeship', color=True,
+                               featureidkey='properties.name',
+                               color_continuous_scale="Viridis",
+                               # range_color=(0, 12),
+                               mapbox_style="carto-positron",
+                               zoom=5.5, center={"lat": 52.11, "lon": 19.42},
+                               opacity=0.5,
+                               labels={'MainAddressVoivodeship': 'Województwo',
+                                       'True': 'Działające przedsiębiorstwa',
+                                       'False': 'Zamknięte przedsiębiorstwa'}
+                               )
+    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0}, height=700)
+    html_elements.append(dcc.Graph(figure=fig))
+
 
 @app.callback(
     [Output('scatter1', 'hidden'), Output('scatter2', 'hidden')],
@@ -82,7 +98,6 @@ def add():
 )
 def update_covid_graph(dropdown_value):
     ctx = dash.callback_context
-    print(dropdown_value)
     if not ctx.triggered or dropdown_value == '1':
         return [False, True]
 
