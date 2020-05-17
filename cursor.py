@@ -34,11 +34,16 @@ class Cursor:
                self.df[self.df['Target'] == target]['NoOfUniquePKDClasses'], \
                self.df[self.df['MainAddressVoivodeship'] == target]['RandomDate']
 
-    def get2(self):
-        return self.df.query("Sex=='M' and Target=='0'").count()['Target'],\
-               self.df.query("Sex=='M' and Target=='1'").count()['Target'],\
-               self.df.query("Sex=='F' and Target=='0'").count()['Target'],\
-               self.df.query("Sex=='F' and Target=='1'").count()['Target']
+    def get_target_per_sex_voivodeship(self):
+        ret = self.df.groupby(['MainAddressVoivodeship', 'Sex', 'Target'])\
+            .size().unstack(fill_value=0).unstack(fill_value=0)
+        ret.columns = 'False_F', 'False_M', 'True_F', 'True_M'
+        for voivodeship in voivodeships:
+            if voivodeship not in list(ret.index):
+                row = pd.Series({'False_F': 0, 'False_M': 0, 'True_F': 0, 'True_M': 0}, name=voivodeship)
+                ret = ret.append(row)
+        ret['MainAddressVoivodeship'] = ret.index
+        return ret
 
     def get_df(self):
         return self.df
@@ -51,6 +56,16 @@ class Cursor:
                 ret = ret.append(row)
         ret['MainAddressVoivodeship'] = ret.index
         return ret
+
+    def group_by_county(self):
+        return self.df.groupby(['MainAddressVoivodeship', 'MainAddressCounty']).size().unstack(fill_value=0)
+
+    def get_target_per_sex(self):
+        return self.df.query("Sex=='M' and Target=='0'").count()['Target'],\
+               self.df.query("Sex=='M' and Target=='1'").count()['Target'],\
+               self.df.query("Sex=='F' and Target=='0'").count()['Target'], \
+               self.df.query("Sex=='F' and Target=='1'").count()['Target']
+
 
     def get_map(self):
         return self.poland_map

@@ -9,7 +9,6 @@ from cursor import Cursor
 html_elements = []
 
 data = Cursor()
-fig1 = px.pie(names=['m, 0', 'm, 1', 'f, 0', 'f, 1'], values=data.get2())
 html_elements.append(html.Div([
     dcc.Graph(
         id='graph1',
@@ -35,7 +34,6 @@ html_elements.append(html.Div([
         },
     ),
     html.Button('0', id='button0', n_clicks=0),
-    dcc.Graph(figure=fig1)
 ],))
 
 

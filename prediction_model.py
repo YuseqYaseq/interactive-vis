@@ -1,3 +1,5 @@
+import json
+
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
@@ -42,6 +44,7 @@ def get_scatter_figure(x, col1, col2):
                   )
          }
 
+map_data = cursor.get_target_per_sex_voivodeship()
 
 def add():
     # confusion matrix
@@ -88,9 +91,43 @@ def add():
                                        'True': 'Działające przedsiębiorstwa',
                                        'False': 'Zamknięte przedsiębiorstwa'}
                                )
-    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0}, height=700)
-    html_elements.append(dcc.Graph(figure=fig))
+    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0},
+                      height=700,
+                      width=1000,
+                      autosize=True,
+                      clickmode='event+select')
 
+    ############
+    html_elements.append(html.Div([
+        html.Div([
+            html.Div([
+                dcc.Graph(id='map', figure=fig)
+            ], style={'float': 'left','margin': 'auto'}),
+            html.Div([
+                dcc.Graph(figure=px.pie(names=['m, 1', 'm, 0', 'f, 1', 'f, 0'],
+                                        values=cursor.get_target_per_sex()),
+                          id='map_pie',
+                          style={'height': 700, 'width': 550}),
+                html.P("ABC")
+            ], style={'float': 'right', 'margin': 'auto'})
+        ])]))
+
+
+@app.callback(
+    Output('map_pie', 'figure'),
+    [Input('map', 'selectedData')])
+def display_selected_data(selectedData):
+
+    if selectedData is None:
+        values = cursor.get_target_per_sex()
+    else:
+        selected_voivodeships = [elem['location'] for elem in selectedData['points']]
+        values = map_data[map_data['MainAddressVoivodeship'].isin(selected_voivodeships)]
+        values = [values[column].sum() for column in ['False_M', 'True_M', 'False_F', 'True_F']]
+    fig=px.pie(names=['m, 0', 'm, 1', 'f, 0', 'f, 1'], values=values)
+    return fig
+
+#########
 
 @app.callback(
     [Output('scatter1', 'hidden'), Output('scatter2', 'hidden')],
