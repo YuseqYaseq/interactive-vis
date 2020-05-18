@@ -34,11 +34,32 @@ class Cursor:
                self.df[self.df['Target'] == target]['NoOfUniquePKDClasses'], \
                self.df[self.df['MainAddressVoivodeship'] == target]['RandomDate']
 
-    def get2(self):
-        return self.df.query("Sex=='M' and Target=='0'").count()['Target'],\
-               self.df.query("Sex=='M' and Target=='1'").count()['Target'],\
-               self.df.query("Sex=='F' and Target=='0'").count()['Target'],\
-               self.df.query("Sex=='F' and Target=='1'").count()['Target']
+    def get_target_per_category_voivodeship(self, category_name):
+        ret = self.df.groupby(['MainAddressVoivodeship', category_name, 'Target'])\
+            .size().unstack(fill_value=0).unstack(fill_value=0)
+        ret.columns = [str(i[0]) + '_' + str(i[1]) for i in list(ret.columns)]
+        for row in self.__yield_rows_for_missing_voivodeships(list(ret.index),
+                                                              dict(zip(ret.columns, [0 for _ in ret.columns]))):
+            ret = ret.append(row)
+        ret['MainAddressVoivodeship'] = ret.index
+        return ret
+
+    def get_target_per_updated_info_voivodeship(self):
+        ret = self.df.query('IsPhoneNo == True and IsEmail == True and IsWWW == True')\
+                     .groupby(['MainAddressVoivodeship', 'Target'])\
+                     .size().unstack(fill_value=0)
+        for row in self.__yield_rows_for_missing_voivodeships(list(ret.index), {False: 0, True: 0}):
+            ret = ret.append(row)
+        ret2 = self.df.query('IsPhoneNo == False or IsEmail == False or IsWWW == False') \
+            .groupby(['MainAddressVoivodeship', 'Target']) \
+            .size().unstack(fill_value=0)
+        for row in self.__yield_rows_for_missing_voivodeships(list(ret2.index), {False: 0, True: 0}):
+            ret2 = ret2.append(row)
+        ret.columns = [str(i) + '_HasInfo' for i in list(ret.columns)]
+        ret2.columns = [str(i) + '_NoInfo' for i in list(ret2.columns)]
+        ret = ret.join(ret2)
+        ret['MainAddressVoivodeship'] = ret.index
+        return ret
 
     def get3(self):
         return self.df[['MainAndCorrespondenceAreTheSame']].groupby('MainAndCorrespondenceAreTheSame')['MainAndCorrespondenceAreTheSame'].count()
@@ -71,15 +92,22 @@ class Cursor:
 
     def get_target_per_voivodeship(self):
         ret = self.df.groupby(['MainAddressVoivodeship', 'Target']).size().unstack(fill_value=0)
-        for voivodeship in voivodeships:
-            if voivodeship not in list(ret.index):
-                row = pd.Series({False: 0, True: 0}, name=voivodeship)
-                ret = ret.append(row)
+        for row in self.__yield_rows_for_missing_voivodeships(list(ret.index), {False: 0, True: 0}):
+            ret = ret.append(row)
         ret['MainAddressVoivodeship'] = ret.index
         return ret
 
+    def group_by_county(self):
+        return self.df.groupby(['MainAddressVoivodeship', 'MainAddressCounty']).size().unstack(fill_value=0)
+
     def get_map(self):
         return self.poland_map
+
+    @staticmethod
+    def __yield_rows_for_missing_voivodeships(current_list, fill_dict):
+        for voivodeship in voivodeships:
+            if voivodeship not in current_list:
+                yield pd.Series(fill_dict, name=voivodeship)
 
 
 cursor = Cursor()

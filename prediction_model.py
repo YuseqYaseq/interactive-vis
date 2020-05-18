@@ -1,3 +1,5 @@
+import json
+
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
@@ -8,7 +10,7 @@ from dash.dependencies import Output, Input
 
 from net import get_statistics
 from app import app
-from cursor import cursor
+from cursor import cursor, voivodeships
 
 html_elements = []
 
@@ -41,6 +43,12 @@ def get_scatter_figure(x, col1, col2):
                   hovermode='closest',
                   )
          }
+
+
+map_data_sex = cursor.get_target_per_category_voivodeship('Sex')
+map_data_citizenship = cursor.get_target_per_category_voivodeship('HasPolishCitizenship')
+map_data_shareholder = cursor.get_target_per_category_voivodeship('ShareholderInOtherCompanies')
+map_data_updated_info = cursor.get_target_per_updated_info_voivodeship()
 
 
 def add():
@@ -88,9 +96,73 @@ def add():
                                        'True': 'Działające przedsiębiorstwa',
                                        'False': 'Zamknięte przedsiębiorstwa'}
                                )
-    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0}, height=700)
-    html_elements.append(dcc.Graph(figure=fig))
+    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0},
+                      height=700,
+                      width=1000,
+                      autosize=True,
+                      clickmode='event+select')
 
+    ############
+    html_elements.append(html.Div([
+        # sex
+        html.Div([
+            dcc.Graph(id='map', figure=fig, style={'float': 'left', 'width': '50%'}),
+            dcc.Graph(id='map_pie_sex', style={'float': 'left', 'width': '25%'}),
+            dcc.Graph(id='map_pie_citizenship', style={'float': 'left', 'width': '25%'}),
+            dcc.Graph(id='map_pie_shareholder', style={'float': 'left', 'width': '25%'}),
+            dcc.Graph(id='map_pie_has_info', style={'float': 'left', 'width': '25%'}),
+        ])]))
+
+
+def get_map_piechart_fig(selectedData, map_data, pie_names, title):
+    if selectedData is None:
+        selected_voivodeships = voivodeships
+    else:
+        selected_voivodeships = [elem['location'] for elem in selectedData['points']]
+    values = map_data[map_data['MainAddressVoivodeship'].isin(selected_voivodeships)]
+    values = [values[column].sum() for column in map_data.columns[:-1]]
+    names = [pie_names[column] for column in map_data.columns[:-1]]
+    fig = px.pie(names=names, values=values, title=title)
+    fig.update_layout(margin={"r": 50, "t": 50, "l": 50, "b": 50},
+                      height=300)
+    return fig
+
+
+@app.callback(
+    [Output('map_pie_sex', 'figure'),
+     Output('map_pie_citizenship', 'figure'),
+     Output('map_pie_shareholder', 'figure'),
+     Output('map_pie_has_info', 'figure')],
+    [Input('map', 'selectedData')])
+def display_selected_data(selectedData):
+    return get_map_piechart_fig(selectedData,
+                                map_data_sex,
+                                {'False_F': 'f, 0', 'False_M': 'm, 0', 'True_F': 'f, 1', 'True_M': 'm, 1'},
+                                'Odsetek kobiet i mężczyzn'),\
+           get_map_piechart_fig(selectedData,
+                                map_data_citizenship,
+                                {'True_True': 'Polak, 1',
+                                 'False_True': 'Polak, 0',
+                                 'True_False': 'Obcokrajowiec, 1',
+                                 'False_False': 'Obcokrajowiec, 0'},
+                                'Odsetek Polaków i obcokrajowców'),\
+           get_map_piechart_fig(selectedData,
+                                map_data_shareholder,
+                                {'True_True': 'Udziałowiec, 1',
+                                'True_False': 'Nieudziałowiec, 1',
+                                'False_True': 'Udziałowiec, 0',
+                                'False_False': 'Nieudziałowiec, 0'},
+                                'Odsetek udziałowców w innych przedsiębiorstwach'),\
+           get_map_piechart_fig(selectedData,
+                                map_data_updated_info,
+                                {'True_HasInfo': 'Wypełnione dane, 1',
+                                'False_HasInfo': 'Wypełnione dane, 0',
+                                'True_NoInfo': 'Niewypełnione dane, 1',
+                                'False_NoInfo': 'Niewypełnione dane, 0'},
+                                'Odsetek przedsiębiorstw z wypełnionymi danymi kontaktowymi'),
+
+
+#########
 
 @app.callback(
     [Output('scatter1', 'hidden'), Output('scatter2', 'hidden')],
