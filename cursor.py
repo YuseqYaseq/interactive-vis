@@ -59,6 +59,13 @@ class Cursor:
         filtered_data = self.df.query(month_filter).query(voivod_filter)
         return filtered_data[['MainAndCorrespondenceAreTheSame']].groupby('MainAndCorrespondenceAreTheSame')['MainAndCorrespondenceAreTheSame'].count()
 
+    def get_data_by_month(self):
+        target_by_month = self.df.groupby('MonthOfStartingOfTheBusiness')['Target']
+        continued_by_month = self.df.query('Target == 0').groupby('MonthOfStartingOfTheBusiness')['Target'].count()
+        non_continued_by_month = self.df.query('Target == 1').groupby('MonthOfStartingOfTheBusiness')['Target'].count()
+        months = target_by_month.unique().index.values
+        return months, continued_by_month, non_continued_by_month
+
     def get_df(self):
         return self.df
 
