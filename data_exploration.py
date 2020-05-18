@@ -5,18 +5,18 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 from app import app
-from cursor import Cursor
+from cursor import Cursor, cursor
 
 html_elements = []
 
 data = Cursor()
-fig1 = px.pie(names=['m, 0', 'm, 1', 'f, 0', 'f, 1'], values=data.get2())
 
 months, cont_by_month, discont_by_month = data.get_data_by_month()
 
-barchart_by_month = go.Figure(data=[
-    go.Bar(name='Kontynuowane', x=months, y=cont_by_month),
-    go.Bar(name='Niekontynuowane', x=months, y=discont_by_month)
+values = cursor.get_target_by_month_and_voivod(None, ['LUBELSKIE'])
+fig = go.Figure(data=[
+    go.Bar(name='Kontynuowane', x=values[0].index.values, y=values[0].values),
+    go.Bar(name='Niekontynuowane', x=values[1].index.values, y=values[1].values)
 ])
 
 html_elements.append(html.Div([
@@ -44,14 +44,9 @@ html_elements.append(html.Div([
         },
     ),
     html.Button('0', id='button0', n_clicks=0),
-    dcc.Graph(figure=fig1),
-    html.Ul([
-        html.Li("aaa"),
-        html.Li("bbb")
-    ]),
     dcc.Graph(
         id='graph3',
-        figure=barchart_by_month
+        figure=fig
     )
 ], ))
 

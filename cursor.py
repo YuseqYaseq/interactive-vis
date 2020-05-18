@@ -6,6 +6,9 @@ voivodeships = ['ŚWIĘTOKRZYSKIE', 'WIELKOPOLSKIE', 'KUJAWSKO-POMORSKIE', 'LUBE
                 'MAŁOPOLSKIE', 'DOLNOŚLĄSKIE', 'LUBUSKIE', 'MAZOWIECKIE', 'OPOLSKIE', 'PODLASKIE',
                 'POMORSKIE', 'PODKARPACKIE', 'ZACHODNIOPOMORSKIE', 'ŁÓDZKIE', 'WARMIŃSKO-MAZURSKIE']
 
+months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
+          'November', 'December']
+
 
 def clean_voivodeships(x):
     if isinstance(x, str):
@@ -64,9 +67,13 @@ class Cursor:
     def get3(self):
         return self.df[['MainAndCorrespondenceAreTheSame']].groupby('MainAndCorrespondenceAreTheSame')['MainAndCorrespondenceAreTheSame'].count()
 
-    def get4(self, month_value, voivod_value):
+    def get_target_by_month_and_voivod(self, month_value, voivod_value):
         month_filter = []
         voivod_filter = []
+        if month_value is None:
+            month_value = months
+        if voivod_value is None:
+            voivod_value = voivodeships
         for month in month_value:
             s = "MonthOfStartingOfTheBusiness == \"%s\"" % (month)
             month_filter.append(s)
@@ -78,7 +85,7 @@ class Cursor:
         month_filter = " | ".join(month_filter)
         voivod_filter = " | ".join(voivod_filter)
         filtered_data = self.df.query(month_filter).query(voivod_filter)
-        return filtered_data[['MainAndCorrespondenceAreTheSame']].groupby('MainAndCorrespondenceAreTheSame')['MainAndCorrespondenceAreTheSame'].count()
+        return filtered_data.groupby(['MonthOfStartingOfTheBusiness', 'Target']).size().unstack(fill_value=0).unstack()
 
     def get_data_by_month(self):
         target_by_month = self.df.groupby('MonthOfStartingOfTheBusiness')['Target']
