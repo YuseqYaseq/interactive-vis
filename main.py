@@ -5,4 +5,4 @@ from prediction_model import html_elements as model_html
 if __name__ == '__main__':
     model_div.children = model_html
     exploration_div.children = exploration_html
-    app.run_server(debug=True)
+    app.run_server(debug=True, use_reloader=False)
