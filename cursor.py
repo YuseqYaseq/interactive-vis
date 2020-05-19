@@ -26,7 +26,7 @@ class Cursor:
     def __init__(self):
         self.df = pd.read_csv('data/ceidg_data_classif.csv', nrows=1000)
         self.sections = pd.read_csv('data/sections.csv')
-        
+
         self.df['MainAddressVoivodeship'] = self.df['MainAddressVoivodeship'].map(clean_voivodeships)
 
         with open('data/poland_geo.json', 'r', encoding='utf-8') as file:
@@ -198,7 +198,7 @@ class Cursor:
         terminated = filtered_data[self.df.Target==1]
         allcount  = filtered_data.set_index('PKDMainSection').join(self.sections.set_index('pkdCode'))['section'].value_counts().rename_axis('pkdCode')
         
-        terminatedRatio = terminated.set_index('PKDMainSection').join(self.sections.set_index('pkdCode'))['section'].value_counts().divide(allcount).multiply(100)
+        terminatedRatio = terminated.set_index('PKDMainSection').join(self.sections.set_index('pkdCode'))['section'].value_counts().divide(allcount)
         return terminatedRatio
 
     def get_subset(self, **kwargs):
