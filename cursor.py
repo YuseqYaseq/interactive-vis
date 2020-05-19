@@ -165,7 +165,7 @@ class Cursor:
         terminated = filtered_data[self.df.Target==1]
         terminatedPkdSections = terminated["NoOfUniquePKDSections"].value_counts().sort_index()
         allPkdSections = filtered_data["NoOfUniquePKDSections"].value_counts().sort_index()
-
+        
         return terminatedPkdSections.divide(allPkdSections).fillna(0)
 
     def get_terminated_byNumberOfUniqueClasses(self, voivod_value):
