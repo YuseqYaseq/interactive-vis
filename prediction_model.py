@@ -83,8 +83,6 @@ def add():
                                                           hover_name=['temp_name' for i, _ in enumerate(pred_error)]),
                                             style={'height': 450})))
 
-    html_elements.append(html.Div(dcc.Graph(id='business_by_month', style={'float': 'left', 'width': '50%'})))
-
     fig = px.choropleth_mapbox(cursor.get_target_per_voivodeship(),
                                geojson=cursor.get_map(),
                                locations='MainAddressVoivodeship', color=True,
@@ -112,7 +110,8 @@ def add():
             dcc.Graph(id='map_pie_sex', style={'float': 'left', 'width': '25%'}),
             dcc.Graph(id='map_pie_citizenship', style={'float': 'left', 'width': '25%'}),
             dcc.Graph(id='map_pie_shareholder', style={'float': 'left', 'width': '25%'}),
-            dcc.Graph(id='map_pie_has_info', style={'float': 'left', 'width': '25%'})
+            dcc.Graph(id='map_pie_has_info', style={'float': 'left', 'width': '25%'}),
+            dcc.Graph(id='business_by_month', style={'float': 'right', 'width': '50%'})
         ])]))
 
 
@@ -129,8 +128,8 @@ def get_map_piechart_fig(selectedData, map_data, pie_names, title):
                       height=300)
     return fig
 
+
 def get_business_by_month_barchart_fig(selected_data):
-    print(selected_data)
     if selected_data is None:
         selected_voivodeships = voivodeships
     else:
@@ -140,6 +139,8 @@ def get_business_by_month_barchart_fig(selected_data):
         go.Bar(name='Kontynuowane', x=values[0].index.values, y=values[0].values),
         go.Bar(name='Niekontynuowane', x=values[1].index.values, y=values[1].values)
     ])
+    fig.update_layout(margin={"r": 50, "t": 50, "l": 50, "b": 50},
+                      height=300)
 
     return fig
 
