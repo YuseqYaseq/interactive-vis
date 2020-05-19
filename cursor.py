@@ -24,6 +24,10 @@ def clean_voivodeships(x):
 class Cursor:
 
     def __init__(self):
+        self.classesdf = pd.read_csv('data/classes.csv')
+        self.divisionsdf = pd.read_csv('data/divisions.csv')
+        self.groupsdf = pd.read_csv('data/groups.csv')
+        self.sections = pd.read_csv('data/sections.csv')
         self.df = pd.read_csv('data/ceidg_data_classif.csv', nrows=1000)
         self.df['MainAddressVoivodeship'] = self.df['MainAddressVoivodeship'].map(clean_voivodeships)
 
@@ -109,6 +113,56 @@ class Cursor:
 
     def get_map(self):
         return self.poland_map
+    
+    def get_mostTerminated(self):
+        terminated = self.df[self.df.Target==1]
+        allcount  = self.df.set_index('PKDMainSection').join(self.sections.set_index('pkdCode'))['section'].value_counts().rename_axis('pkdCode')
+        
+        terminatedRatio = terminated.set_index('PKDMainSection').join(self.sections.set_index('pkdCode'))['section'].value_counts().divide(allcount).multiply(100)
+        return terminatedRatio
+
+    def get_terminated_byNumberOfUniqueClasses(self):
+        terminated = self.df[self.df.Target==1]
+        terminatedPkdClasses = terminated["NoOfUniquePKDClasses"].value_counts().sort_index()
+        allPkdClasses = self.df["NoOfUniquePKDClasses"].value_counts().sort_index()
+        return terminatedPkdClasses.divide(allPkdClasses).fillna(0)
+
+    def get_terminated_byNumberOfUniqueSections(self):
+        terminated = self.df[self.df.Target==1]
+        terminatedPkdSections = terminated["NoOfUniquePKDSections"].value_counts().sort_index()
+        allPkdSections = self.df["NoOfUniquePKDSections"].value_counts().sort_index()
+        return terminatedPkdSections.divide(allPkdSections).fillna(0)
+
+    def get_terminated_byNumberOfAdditionalPlaceOfTheBusiness(self):
+        terminated = self.df[self.df.Target==1]
+        terminated = terminated["NoOfAdditionalPlaceOfTheBusiness"].value_counts().sort_index()
+        all = self.df["NoOfAdditionalPlaceOfTheBusiness"].value_counts().sort_index()
+        return terminated.divide(all).fillna(0)
+
+    def get_terminated_byLicensePossesionRatio(self):
+        terminated = self.df[self.df.Target==1]
+        terminated = terminated["HasLicences"].value_counts().sort_index()
+        all = self.df["HasLicences"].value_counts().sort_index()
+        return terminated.divide(all).fillna(0)
+
+    def get_terminated_byLicensePossesionAll(self):
+        terminated = self.df[self.df.Target==1]
+        terminated = terminated["HasLicences"].value_counts().sort_index()
+        return terminated
+        
+
+    def get_terminated_byLicenseNumber(self):
+        terminated = self.df[self.df.Target==1]
+        terminated = terminated["NoOfLicences"].value_counts().sort_index()
+        all = self.df["NoOfLicences"].value_counts().sort_index()
+        return terminated.divide(all).fillna(0)
+
+    def get_terminated_byDurationOfExistence(self):
+        terminated = self.df[self.df.Target==1]
+        terminated = terminated["DurationOfExistenceInMonths"].value_counts().sort_index()
+        all = self.df["DurationOfExistenceInMonths"].value_counts().sort_index()
+        return terminated.divide(all).fillna(0)
+
 
     @staticmethod
     def __yield_rows_for_missing_voivodeships(current_list, fill_dict):

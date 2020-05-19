@@ -4,7 +4,7 @@ import dash_html_components as html
 from dash import dependencies
 
 external_stylesheets = ['https://raw.githubusercontent.com/plotly/dash-app-stylesheets/master/dash-analytics-report.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
 exploration_div = html.Div(id='exploration_div', hidden=False)
 model_div = html.Div(id='model_div', hidden=True)
 app.layout = html.Div([

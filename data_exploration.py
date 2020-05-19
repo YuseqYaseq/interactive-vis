@@ -19,6 +19,34 @@ fig = go.Figure(data=[
     go.Bar(name='Niekontynuowane', x=values[1].index.values, y=values[1].values)
 ])
 
+mostTerminatedData = data.get_mostTerminated()
+mostTerminatedFigure = go.Figure(data=[
+    go.Bar(x=mostTerminatedData.index.values, y=mostTerminatedData.values)
+])
+
+terminatedByUniqueClassesData = data.get_terminated_byNumberOfUniqueClasses()
+terminatedByUniqueClassesFigure = px.scatter(terminatedByUniqueClassesData, y="NoOfUniquePKDClasses", x=terminatedByUniqueClassesData.index)
+terminatedByUniqueClassesFigure.update_traces(marker=dict(size=12, line=dict(width=3)),
+                                               selector=dict(mode='markers'))
+
+terminatedByUniqueSectionsData = data.get_terminated_byNumberOfUniqueSections()
+terminatedByUniqueSectionsFigure = px.scatter(terminatedByUniqueSectionsData, y="NoOfUniquePKDSections", x=terminatedByUniqueSectionsData.index)
+terminatedByUniqueSectionsFigure.update_traces(marker=dict(size=12, line=dict(width=3)),
+                                               selector=dict(mode='markers'))
+
+terminatedByLicensePossesionRatioData = data.get_terminated_byLicensePossesionRatio()
+terminatedByLicensePossesionRatioFigure = go.Figure(data=[
+    go.Bar(x=terminatedByLicensePossesionRatioData.index.values, y=terminatedByLicensePossesionRatioData.values)
+])
+
+terminatedByLicensePossesionAllData = data.get_terminated_byLicensePossesionAll()
+terminatedByLicensePossesionAllFigure = px.pie(names=terminatedByLicensePossesionAllData.index.values, values=terminatedByLicensePossesionAllData.values)
+
+terminatedByDurationOfExistenceData = data.get_terminated_byDurationOfExistence()
+terminatedByDurationOfExistenceFigure = go.Figure(data=[
+    go.Scatter(x=terminatedByDurationOfExistenceData.index.values, y=terminatedByDurationOfExistenceData.values)
+])
+
 html_elements.append(html.Div([
     dcc.Graph(
         id='graph1',
@@ -47,7 +75,37 @@ html_elements.append(html.Div([
     dcc.Graph(
         id='graph3',
         figure=fig
-    )
+    ),
+    html.H3("Sekcje, gdzie najrzadziej kontynuują działalność w okresie 12 miesięcy"),
+    dcc.Graph(
+        id='mostTerminatedGraph',
+        figure = mostTerminatedFigure,
+    ),
+    html.H3("Procent firm które wstrzymały swoją działalność w zależności od liczby unikalnych klas PKD"),
+    dcc.Graph(
+        id='mostTerminatedByUniqueClasses',
+        figure = terminatedByUniqueClassesFigure,
+    ),
+    html.H3("Procent firm które wstrzymały swoją działalność w zależności od liczby unikalnych sekcji PKD"),
+    dcc.Graph(
+        id='mostTerminatedByUniqueSections',
+        figure = terminatedByUniqueSectionsFigure,
+    ),
+    html.H3("Jaki procent firm które posiadają/nie posiadają licencji zawiesza działalność w okresie 12 miesięcy"),
+    dcc.Graph(
+        id='terminatedByLicensePossesionRatio',
+        figure=terminatedByLicensePossesionRatioFigure
+    ),
+    html.H3("Jaki procent wśród firm, które zawiesza działalność w okresie 12 miesięcy stanowią firmy z licencją/bez licencji"),
+    dcc.Graph(
+        id='terminatedByLicensePossesionAll',
+        figure=terminatedByLicensePossesionAllFigure
+    ),
+    html.H3("Jaki procent firm zamknie swoją działalność w okresie 12 miesięcy w zależności od ilości miesięcy życia firmy"),
+    dcc.Graph(
+        id='terminatedByDurationOfExistence',
+        figure=terminatedByDurationOfExistenceFigure
+    ),
 ], ))
 
 
