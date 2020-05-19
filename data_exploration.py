@@ -43,8 +43,8 @@ fig = px.choropleth_mapbox(cursor.get_target_per_voivodeship(),
                            )
 
 fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0},
-                  height=600,
-                  width=750,
+                  height=500,
+                  width=600,
                   autosize=True,
                   clickmode='event+select',
                   plot_bgcolor=bg_color,
@@ -56,12 +56,12 @@ html_elements.append(html.Div([
         html.H2('Dwuwartościowe cechy działalności a jej kontynuowanie',
                 id='pie-charts',
                 style={'float': 'left', 'width': '100%'}),
-        dcc.Graph(id='map', figure=fig, style={'float': 'left', 'width': '40%', 'height': 800}),
-        dcc.Graph(id='map_pie_sex', style={'float': 'left', 'width': '25%', 'height': 400}),
-        dcc.Graph(id='map_pie_citizenship', style={'float': 'left', 'width': '25%', 'height': 400}),
-        dcc.Graph(id='map_pie_shareholder', style={'float': 'left', 'width': '25%', 'height': 400}),
-        dcc.Graph(id='map_pie_has_info', style={'float': 'left', 'width': '25%', 'height': 400}),
-        dcc.Graph(id='map_pie_licence', style={'float': 'left', 'width': '25%', 'height': 400}),
+        dcc.Graph(id='map', figure=fig, style={'float': 'left', 'width': '40%', 'height': 650}),
+        dcc.Graph(id='map_pie_sex', style={'float': 'left', 'width': '20%', 'height': 300}),
+        dcc.Graph(id='map_pie_citizenship', style={'float': 'left', 'width': '20%', 'height': 300}),
+        dcc.Graph(id='map_pie_shareholder', style={'float': 'left', 'width': '20%', 'height': 300}),
+        dcc.Graph(id='map_pie_has_info', style={'float': 'left', 'width': '30%', 'height': 300}),
+        dcc.Graph(id='map_pie_licence', style={'float': 'left', 'width': '30%', 'height': 300}),
         html.H2('Działalności kontynuowane i niekontynuowane w rozłożeniu na miesiące rozpoczęcia działalności',
                 id='by-month',
                 style={'float': 'left', 'width': '100%'}),
@@ -101,7 +101,7 @@ def get_business_by_month_barchart_fig(selected_data):
                marker_color=discrete_color_sequence[1])
     ])
     fig.update_layout(margin={"r": 50, "t": 50, "l": 50, "b": 50},
-                      height=300,
+                      height=200,
                       plot_bgcolor=bg_color,
                       paper_bgcolor=bg_color,
                       font=font_settings, )
@@ -190,70 +190,3 @@ def display_selected_data(selectedData):
            get_business_by_month_barchart_fig(selectedData), \
            get_terminated_byNumberOfUniqueSections_barchart_fig(selectedData), \
            get_terminated_byNumberOfUniqueClasses_scatter_fig(selectedData)
-
-
-# html_elements.append(html.Div([
-#     dcc.Graph(
-#         id='graph1',
-#         figure={
-#             'data': [dict(
-#                 x=data.get1(i)[0],
-#                 y=data.get1(i)[1],
-#                 text=data.get1(i)[2],
-#                 mode='markers',
-#                 opacity=0.7,
-#                 marker={
-#                     'size': 15,
-#                     'line': {'width': 0.5, 'color': 'white'}
-#                 },
-#                 name=i
-#             ) for i in [True, False]],
-#             'layout': dict(
-#                 xaxis={'type': 'log', 'title': 'Czas istnienia spółki [msc]'},
-#                 yaxis={'title': 'Liczba unikalnych PKD'},
-#                 legend={'x': 0, 'y': 1},
-#                 hovermode='closest'
-#             ),
-#         },
-#     ),
-#     html.Button('0', id='button0', n_clicks=0),
-#     dcc.Graph(
-#         id='graph3',
-#         figure=fig
-#     )
-# ], ))
-
-
-# @app.callback(
-#     dependencies.Output('graph1', 'figure'),
-#     [dependencies.Input('button0', 'n_clicks')]
-# )
-# def update_graph(b0):
-#     if b0 % 3 == 0:
-#         tab = [True, False]
-#     elif b0 % 3 == 1:
-#         tab = [True]
-#     elif b0 % 3 == 2:
-#         tab = [False]
-#
-#     return {
-#         'data': [dict(
-#             x=data.get1(i)[0],
-#             y=data.get1(i)[1],
-#             text=data.get1(i)[2],
-#             mode='markers',
-#             opacity=0.7,
-#             marker={
-#                 'size': 15,
-#                 'line': {'width': 0.5, 'color': 'white'}
-#             },
-#             name=i
-#         ) for i in tab],
-#         'layout': dict(
-#             xaxis={'type': 'log', 'title': 'Czas istnienia spółki [msc]'},
-#             yaxis={'title': 'Liczba unikalnych PKD'},
-#             # margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
-#             legend={'x': 0, 'y': 1},
-#             hovermode='closest'
-#         )
-#     }

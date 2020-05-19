@@ -25,6 +25,7 @@ app.layout = html.Div([
     html.Div(style={'float': 'left', 'width': '8%', 'height': 1000}),
     html.Div(style={
         'border-left': '6px solid green',
+        'margin-right': '12px',
         'height': '2000px',
         'float': 'left'
     }),
@@ -35,8 +36,4 @@ app.layout = html.Div([
                  html.H1("Właściwości modelu", id='model-features', style={'float': 'left', 'width': '100%'}),
                  model_div
              ])
-    # html.Button('exploration', id='exploration_button', n_clicks=0),
-    # html.Button('model', id='model_button', n_clicks=0),
-    # exploration_div,
-    # model_div
 ])
