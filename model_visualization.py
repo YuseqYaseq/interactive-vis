@@ -139,19 +139,19 @@ def update_lr_importance(n_features):
 
 
 lr_tab = html.Div([
-    html.H2("Logistic Regression"),
+    html.H2("Regresja logistyczna"),
     html.Div([
         html.Div([
-            html.H3("Precision recall curve"),
+            html.H3("Krzywa Precision-Recall"),
             dcc.Graph(figure=get_precision_recall_figure("lr")),
         ], style={'width': '49%', 'display': 'inline-block'}),
         html.Div([
-            html.H3("ROC curve"),
+            html.H3("Krzywa ROC"),
             dcc.Graph(figure=get_roc_figure("lr"))
         ], style={'width': '49%', 'display': 'inline-block'})
     ]),
     html.Div([
-        html.H3("Feature importance"),
+        html.H3("Znaczenie cech"),
         dcc.Slider(id="lr-importance-slider", min=3, max=69, step=1, value=10, tooltip=dict(always_visible=True)),
         html.H5("Number of most important features"),
         dcc.Graph(id="lr-feature-importance")
@@ -159,30 +159,30 @@ lr_tab = html.Div([
 ])
 
 lgbm_tab = html.Div([
-    html.H2("LGBM Classifier"),
+    html.H2("Klasyfikator LGBM"),
     html.Div([
         html.Div([
-            html.H3("Precision recall curve"),
+            html.H3("Krzywa Precision-Recall"),
             dcc.Graph(figure=get_precision_recall_figure("lgbm")),
         ], style={'width': '49%', 'display': 'inline-block'}),
         html.Div([
-            html.H3("ROC curve"),
+            html.H3("Krzywa ROC"),
             dcc.Graph(figure=get_roc_figure("lgbm"))
         ], style={'width': '49%', 'display': 'inline-block'})
     ]),
     html.Div([
-        html.H3("Feature importance"),
+        html.H3("Znaczenie cech"),
         dcc.Slider(id="lgbm-importance-slider", min=3, max=28, step=1, value=10, tooltip=dict(always_visible=True)),
-        html.H5("Number of most important features"),
+        html.H5("Liczba wyświetlanych najważniejszych cech"),
         dcc.Graph(id="lgbm-feature-importance")
     ])
 ])
 
 layout = html.Div([
-    html.H1("Classification model comparison"),
+    html.H1("Porównanie modeli klasyfikujących"),
     dcc.Tabs(id="tabs", value='tab-1', children=[
-        dcc.Tab(label='Logistic regression', value='lr', children=[lr_tab]),
-        dcc.Tab(label='LGBM Classfier', value='lgbm', children=[lgbm_tab]),
+        dcc.Tab(label='Regresja logistyczna', value='lr', children=[lr_tab]),
+        dcc.Tab(label='Klasyfikator LGBM', value='lgbm', children=[lgbm_tab]),
     ]),
     html.Div(id='tabs-content')
 ], style={'float': 'left', 'width': '100%'})
