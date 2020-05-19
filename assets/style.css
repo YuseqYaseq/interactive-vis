@@ -1,3 +1,9 @@
 body {
     background-color: #C2EABD
 }
+
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
