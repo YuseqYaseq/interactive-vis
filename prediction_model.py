@@ -16,7 +16,10 @@ html_elements = []
 
 
 def create_table(array):
-    return html.Table([html.Tr([html.Th([array[i, j]]) for j in range(array.shape[1])]) for i in range(array.shape[0])])
+    return html.Table(
+        [html.Tr([html.Th([array[i, j]]) for j in range(array.shape[1])]) for i in range(array.shape[0])],
+        style={'float': 'left', 'width': '100%'}
+    )
 
 
 def get_pred_error(output, true_y):
@@ -57,21 +60,27 @@ def add():
     cm = [['', 'Predicted False', 'Predicted True'],
           ['Actual False', cm[0][0], cm[0][1]],
           ['Actual True', cm[1][0], cm[1][1]]]
-    params_dropdown = [{'label': c, 'value': c} for c in ['1', '2']]
+    params_dropdown = [{'label': c, 'value': d} for c, d in zip(['PKDDivisions/PKDClasses', 'PKDClasses/PKDDivisions'],
+                                                                ['1', '2'])]
     html_elements.append(create_table(np.array(cm)))
     html_elements.append(dcc.Dropdown(id='scatter_dropdown',
                                       options=params_dropdown,
-                                      value='1'))
+                                      value='1',
+                                      style={
+                                          'float': 'left',
+                                          'width': '100%'
+                                      })
+                         )
     html_elements.append(html.Div(dcc.Graph(figure=get_scatter_figure(data,
                                                                       'NoOfUniquePKDDivsions',
                                                                       'NoOfUniquePKDClasses', ),
-                                            style={'height': 450}),
+                                            style={'float': 'left', 'width': '100%', 'height': 450}),
                                   id='scatter1'))
 
     html_elements.append(html.Div(dcc.Graph(figure=get_scatter_figure(data,
                                                                       'PKDMainDivision',
                                                                       'NoOfUniquePKDClasses', ),
-                                            style={'height': 450}),
+                                            style={'float': 'left', 'width': '100%', 'height': 450}),
                                   id='scatter2',
                                   hidden=True))
 
@@ -81,9 +90,7 @@ def add():
                                             figure=px.bar(x=[i for i, _ in enumerate(pred_error)],
                                                           y=pred_error,
                                                           hover_name=['temp_name' for i, _ in enumerate(pred_error)]),
-                                            style={'height': 450})))
-
-    html_elements.append(html.Div(dcc.Graph(id='business_by_month', style={'float': 'left', 'width': '50%'})))
+                                            style={'float': 'left', 'width': '100%', 'height': 450})))
 
     fig = px.choropleth_mapbox(cursor.get_target_per_voivodeship(),
                                geojson=cursor.get_map(),
@@ -108,11 +115,12 @@ def add():
     html_elements.append(html.Div([
         # sex
         html.Div([
-            dcc.Graph(id='map', figure=fig, style={'float': 'left', 'width': '50%'}),
-            dcc.Graph(id='map_pie_sex', style={'float': 'left', 'width': '25%'}),
-            dcc.Graph(id='map_pie_citizenship', style={'float': 'left', 'width': '25%'}),
-            dcc.Graph(id='map_pie_shareholder', style={'float': 'left', 'width': '25%'}),
-            dcc.Graph(id='map_pie_has_info', style={'float': 'left', 'width': '25%'})
+            dcc.Graph(id='map', figure=fig, style={'float': 'left', 'width': '50%', 'height': 1200}),
+            dcc.Graph(id='business_by_month', style={'float': 'left', 'width': '50%', 'height': 400}),
+            dcc.Graph(id='map_pie_sex', style={'float': 'left', 'width': '25%', 'height': 400}),
+            dcc.Graph(id='map_pie_citizenship', style={'float': 'left', 'width': '25%', 'height': 400}),
+            dcc.Graph(id='map_pie_shareholder', style={'float': 'left', 'width': '25%', 'height': 400}),
+            dcc.Graph(id='map_pie_has_info', style={'float': 'left', 'width': '25%', 'height': 400})
         ])]))
 
 

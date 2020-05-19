@@ -85,7 +85,53 @@ class Cursor:
         month_filter = " | ".join(month_filter)
         voivod_filter = " | ".join(voivod_filter)
         filtered_data = self.df.query(month_filter).query(voivod_filter)
-        return filtered_data.groupby(['MonthOfStartingOfTheBusiness', 'Target']).size().unstack(fill_value=0).unstack()
+        res = filtered_data.groupby(['MonthOfStartingOfTheBusiness', 'Target']).size().unstack(fill_value=0).unstack()
+        res.index = res.index.map(lambda x: self.map_index(x))
+        res = res.sort_index()
+        res.index = res.index.map(lambda x: self.invert_map_index(x))
+        return res
+
+    def map_months(self, month):
+        month_dict = {
+            "January": 1,
+            "February": 2,
+            "March": 3,
+            "April": 4,
+            "May": 5,
+            "June": 6,
+            "July": 7,
+            "August": 8,
+            "September": 9,
+            "October": 10,
+            "November": 11,
+            "December": 12
+        }
+
+        return month_dict[month]
+
+    def invert_map_months(self, index):
+        month_dict = {
+            1: "January",
+            2: "February",
+            3: "March",
+            4: "April",
+            5: "May",
+            6: "June",
+            7: "July",
+            8: "August",
+            9: "September",
+            10: "October",
+            11: "November",
+            12: "December",
+        }
+
+        return month_dict[index]
+
+    def map_index(self, index):
+        return index[0], self.map_months(index[1])
+
+    def invert_map_index(self, index):
+        return index[0], self.invert_map_months(index[1])
 
     def get_data_by_month(self):
         target_by_month = self.df.groupby('MonthOfStartingOfTheBusiness')['Target']
