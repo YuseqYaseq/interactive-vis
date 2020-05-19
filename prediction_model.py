@@ -25,24 +25,24 @@ def get_pred_error(output, true_y):
 
 def get_scatter_figure(x, col1, col2):
     return {
-             'data': [dict(
-                     x=x[x['Target'] == i][col2],
-                     y=x[x['Target'] == i][col1],
-                     text=x[x['Target'] == i]['MainAddressCounty'],
-                     mode='markers',
-                     opacity=0.8,
-                     marker={
-                         'size': 15,
-                         'line': {'width': 0.5, 'color': 'white'}
-                     },
-                     name=i) for i in [True, False]],
-              'layout': dict(
-                  xaxis={'type': 'log', 'title': col1},
-                  yaxis={'type': 'log', 'title': col2},
-                  legend={'x': 0, 'y': 1},
-                  hovermode='closest',
-                  )
-         }
+        'data': [dict(
+            x=x[x['Target'] == i][col2],
+            y=x[x['Target'] == i][col1],
+            text=x[x['Target'] == i]['MainAddressCounty'],
+            mode='markers',
+            opacity=0.8,
+            marker={
+                'size': 15,
+                'line': {'width': 0.5, 'color': 'white'}
+            },
+            name=i) for i in [True, False]],
+        'layout': dict(
+            xaxis={'type': 'log', 'title': col1},
+            yaxis={'type': 'log', 'title': col2},
+            legend={'x': 0, 'y': 1},
+            hovermode='closest',
+        )
+    }
 
 
 map_data_sex = cursor.get_target_per_category_voivodeship('Sex')
@@ -64,7 +64,7 @@ def add():
                                       value='1'))
     html_elements.append(html.Div(dcc.Graph(figure=get_scatter_figure(data,
                                                                       'NoOfUniquePKDDivsions',
-                                                                      'NoOfUniquePKDClasses',),
+                                                                      'NoOfUniquePKDClasses', ),
                                             style={'height': 450}),
                                   id='scatter1'))
 
@@ -82,6 +82,8 @@ def add():
                                                           y=pred_error,
                                                           hover_name=['temp_name' for i, _ in enumerate(pred_error)]),
                                             style={'height': 450})))
+
+    html_elements.append(html.Div(dcc.Graph(id='business_by_month', style={'float': 'left', 'width': '50%'})))
 
     fig = px.choropleth_mapbox(cursor.get_target_per_voivodeship(),
                                geojson=cursor.get_map(),
@@ -110,7 +112,7 @@ def add():
             dcc.Graph(id='map_pie_sex', style={'float': 'left', 'width': '25%'}),
             dcc.Graph(id='map_pie_citizenship', style={'float': 'left', 'width': '25%'}),
             dcc.Graph(id='map_pie_shareholder', style={'float': 'left', 'width': '25%'}),
-            dcc.Graph(id='map_pie_has_info', style={'float': 'left', 'width': '25%'}),
+            dcc.Graph(id='map_pie_has_info', style={'float': 'left', 'width': '25%'})
         ])]))
 
 
@@ -127,39 +129,54 @@ def get_map_piechart_fig(selectedData, map_data, pie_names, title):
                       height=300)
     return fig
 
+def get_business_by_month_barchart_fig(selected_data):
+    print(selected_data)
+    if selected_data is None:
+        selected_voivodeships = voivodeships
+    else:
+        selected_voivodeships = [elem['location'] for elem in selected_data['points']]
+    values = cursor.get_target_by_month_and_voivod(None, selected_voivodeships)
+    fig = go.Figure(data=[
+        go.Bar(name='Kontynuowane', x=values[0].index.values, y=values[0].values),
+        go.Bar(name='Niekontynuowane', x=values[1].index.values, y=values[1].values)
+    ])
+
+    return fig
 
 @app.callback(
     [Output('map_pie_sex', 'figure'),
      Output('map_pie_citizenship', 'figure'),
      Output('map_pie_shareholder', 'figure'),
-     Output('map_pie_has_info', 'figure')],
+     Output('map_pie_has_info', 'figure'),
+     Output('business_by_month', 'figure')],
     [Input('map', 'selectedData')])
 def display_selected_data(selectedData):
     return get_map_piechart_fig(selectedData,
                                 map_data_sex,
                                 {'False_F': 'f, 0', 'False_M': 'm, 0', 'True_F': 'f, 1', 'True_M': 'm, 1'},
-                                'Odsetek kobiet i mężczyzn'),\
+                                'Odsetek kobiet i mężczyzn'), \
            get_map_piechart_fig(selectedData,
                                 map_data_citizenship,
                                 {'True_True': 'Polak, 1',
                                  'False_True': 'Polak, 0',
                                  'True_False': 'Obcokrajowiec, 1',
                                  'False_False': 'Obcokrajowiec, 0'},
-                                'Odsetek Polaków i obcokrajowców'),\
+                                'Odsetek Polaków i obcokrajowców'), \
            get_map_piechart_fig(selectedData,
                                 map_data_shareholder,
                                 {'True_True': 'Udziałowiec, 1',
-                                'True_False': 'Nieudziałowiec, 1',
-                                'False_True': 'Udziałowiec, 0',
-                                'False_False': 'Nieudziałowiec, 0'},
-                                'Odsetek udziałowców w innych przedsiębiorstwach'),\
+                                 'True_False': 'Nieudziałowiec, 1',
+                                 'False_True': 'Udziałowiec, 0',
+                                 'False_False': 'Nieudziałowiec, 0'},
+                                'Odsetek udziałowców w innych przedsiębiorstwach'), \
            get_map_piechart_fig(selectedData,
                                 map_data_updated_info,
                                 {'True_HasInfo': 'Wypełnione dane, 1',
-                                'False_HasInfo': 'Wypełnione dane, 0',
-                                'True_NoInfo': 'Niewypełnione dane, 1',
-                                'False_NoInfo': 'Niewypełnione dane, 0'},
-                                'Odsetek przedsiębiorstw z wypełnionymi danymi kontaktowymi'),
+                                 'False_HasInfo': 'Wypełnione dane, 0',
+                                 'True_NoInfo': 'Niewypełnione dane, 1',
+                                 'False_NoInfo': 'Niewypełnione dane, 0'},
+                                'Odsetek przedsiębiorstw z wypełnionymi danymi kontaktowymi'), \
+           get_business_by_month_barchart_fig(selectedData)
 
 
 #########
