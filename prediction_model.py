@@ -8,7 +8,6 @@ import plotly.graph_objs as go
 import plotly.express as px
 from dash.dependencies import Output, Input
 
-from net import get_statistics
 from app import app
 from cursor import cursor, voivodeships
 
@@ -53,56 +52,3 @@ def get_scatter_figure(x, col1, col2):
             hovermode='closest',
         )
     }
-
-
-def add():
-    # confusion matrix
-    data, x_test, pred_y, output, y_test, cm = get_statistics()
-    cm = [['', 'Predicted False', 'Predicted True'],
-          ['Actual False', cm[0][0], cm[0][1]],
-          ['Actual True', cm[1][0], cm[1][1]]]
-    params_dropdown = [{'label': c, 'value': d} for c, d in zip(['PKDDivisions/PKDClasses', 'PKDClasses/PKDDivisions'],
-                                                                ['1', '2'])]
-    html_elements.append(create_table(np.array(cm)))
-    html_elements.append(dcc.Dropdown(id='scatter_dropdown',
-                                      options=params_dropdown,
-                                      value='1',
-                                      style={
-                                          'float': 'left',
-                                          'width': '100%'
-                                      })
-                         )
-    html_elements.append(html.Div(dcc.Graph(figure=get_scatter_figure(data,
-                                                                      'NoOfUniquePKDDivsions',
-                                                                      'NoOfUniquePKDClasses', ),
-                                            style={'float': 'left', 'width': '100%', 'height': 450}),
-                                  id='scatter1'))
-
-    html_elements.append(html.Div(dcc.Graph(figure=get_scatter_figure(data,
-                                                                      'PKDMainDivision',
-                                                                      'NoOfUniquePKDClasses', ),
-                                            style={'float': 'left', 'width': '100%', 'height': 450}),
-                                  id='scatter2',
-                                  hidden=True))
-
-    pred_error = get_pred_error(output, y_test)
-    pred_error.sort(reverse=True)
-    html_elements.append(html.Div(dcc.Graph(id='bar1',
-                                            figure=px.bar(x=[i for i, _ in enumerate(pred_error)],
-                                                          y=pred_error,
-                                                          hover_name=['temp_name' for i, _ in enumerate(pred_error)]),
-                                            style={'float': 'left', 'width': '100%', 'height': 450})))
-
-@app.callback(
-    [Output('scatter1', 'hidden'), Output('scatter2', 'hidden')],
-    [Input('scatter_dropdown', 'value')]
-)
-def update_covid_graph(dropdown_value):
-    ctx = dash.callback_context
-    if not ctx.triggered or dropdown_value == '1':
-        return [False, True]
-
-    return [True, False]
-
-
-add()

@@ -24,7 +24,7 @@ def clean_voivodeships(x):
 class Cursor:
 
     def __init__(self):
-        self.df = pd.read_csv('data/ceidg_data_classif.csv', nrows=1000)
+        self.df = pd.read_csv('data/ceidg_data_classif.csv')
         self.sections = pd.read_csv('data/sections.csv')
 
         self.df['MainAddressVoivodeship'] = self.df['MainAddressVoivodeship'].map(clean_voivodeships)

@@ -30,19 +30,19 @@ map_data_licence = cursor.get_target_per_category_voivodeship("HasLicences")
 
 fig = px.choropleth_mapbox(cursor.get_target_per_voivodeship(),
                            geojson=cursor.get_map(),
-                           locations='MainAddressVoivodeship', color=True,
+                           locations='MainAddressVoivodeship', color=False,
                            featureidkey='properties.name',
                            color_continuous_scale=continous_color_sequence,
                            # range_color=(0, 12),
                            mapbox_style="carto-positron",
-                           zoom=5.5, center={"lat": 52.11, "lon": 19.42},
+                           zoom=4.75, center={"lat": 52.11, "lon": 19.42},
                            opacity=0.5,
                            labels={'MainAddressVoivodeship': 'Województwo',
-                                   'True': 'Działające<br>przedsiębiorstwa',
-                                   'False': 'Zamknięte<br>przedsiębiorstwa'}
+                                   'True': 'Zamknięte<br>przedsiębiorstwa',
+                                   'False': 'Działające<br>przedsiębiorstwa'}
                            )
 
-fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0},
+fig.update_layout(margin={"r": 0, "t": 0, "l": 30, "b": 0},
                   height=500,
                   width=600,
                   autosize=True,
@@ -188,7 +188,10 @@ def get_terminated_byNumberOfUniqueClasses_scatter_fig(selected_data):
 def display_selected_data(selectedData):
     return get_map_piechart_fig(selectedData,
                                 map_data_sex,
-                                {'False_F': 'f, 0', 'False_M': 'm, 0', 'True_F': 'f, 1', 'True_M': 'm, 1'},
+                                {'False_F': 'Kobieta, 0',
+                                 'False_M': 'Mężczyzna, 0',
+                                 'True_F': 'Kobieta, 1',
+                                 'True_M': 'Mężczyzna, 1'},
                                 'Odsetek kobiet i mężczyzn'), \
            get_map_piechart_fig(selectedData,
                                 map_data_citizenship,

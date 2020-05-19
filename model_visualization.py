@@ -11,7 +11,7 @@ from sklearn.metrics import precision_recall_curve, roc_curve
 
 from app import app
 from cursor import cursor, voivodeships
-
+from data_exploration import discrete_color_sequence, bg_color
 
 lr = joblib.load("models/lr.joblib")
 lgbm = joblib.load("models/lgbm.joblib")
@@ -34,11 +34,14 @@ def get_precision_recall_figure(model_name):
             {
                 "x": pr_curve[1],  # 1 is first because we want recall as x axis (not precision)
                 "y": pr_curve[0],
+                "marker_color": discrete_color_sequence[0]
             }
         ],
         layout={
             "xaxis": dict(title="recall"),
-            "yaxis": dict(title="precision")
+            "yaxis": dict(title="precision"),
+            "plot_bgcolor": bg_color,
+            "paper_bgcolor": bg_color,
         }
     )
 
@@ -52,11 +55,14 @@ def get_roc_figure(model_name):
             {
                 "x": curve[0],
                 "y": curve[1],
+                "marker_color": discrete_color_sequence[0]
             }
         ],
         layout={
             "xaxis": dict(title="False Positive Rate"),
-            "yaxis": dict(title="True Positive Rate")
+            "yaxis": dict(title="True Positive Rate"),
+            "plot_bgcolor": bg_color,
+            "paper_bgcolor": bg_color,
         }
     )
 
@@ -95,7 +101,9 @@ def update_lr_importance(n_features):
             }
         ],
         "layout": {
-            "title": 'Feature importance (coefficients) for logistic regression'
+            "title": 'Feature importance (coefficients) for logistic regression',
+            "plot_bgcolor": bg_color,
+            "paper_bgcolor": bg_color,
         }
     }
     return fig
@@ -128,11 +136,14 @@ def update_lr_importance(n_features):
                 "x": top_names,
                 "y": top_scores,
                 "type": "bar",
+                "marker_color": discrete_color_sequence[0]
 
             }
         ],
         "layout": {
-            "title": 'Feature importance (number of splits) for lgbm classfier'
+            "title": 'Feature importance (number of splits) for lgbm classfier',
+            "plot_bgcolor": bg_color,
+            "paper_bgcolor": bg_color,
         }
     }
     return fig
@@ -181,8 +192,8 @@ lgbm_tab = html.Div([
 layout = html.Div([
     html.H1("Porównanie modeli klasyfikujących"),
     dcc.Tabs(id="tabs", value='tab-1', children=[
-        dcc.Tab(label='Regresja logistyczna', value='lr', children=[lr_tab]),
-        dcc.Tab(label='Klasyfikator LGBM', value='lgbm', children=[lgbm_tab]),
+        dcc.Tab(label='Regresja logistyczna', value='lr', children=[lr_tab], style={'background-color': discrete_color_sequence[0]}),
+        dcc.Tab(label='Klasyfikator LGBM', value='lgbm', children=[lgbm_tab], style={'background-color': discrete_color_sequence[0]}),
     ]),
     html.Div(id='tabs-content')
 ], style={'float': 'left', 'width': '100%'})
