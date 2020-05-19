@@ -185,6 +185,6 @@ layout = html.Div([
         dcc.Tab(label='LGBM Classfier', value='lgbm', children=[lgbm_tab]),
     ]),
     html.Div(id='tabs-content')
-])
+], style={'float': 'left', 'width': '100%'})
 
 model_visualization_html.append(layout)

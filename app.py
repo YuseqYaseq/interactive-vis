@@ -14,6 +14,10 @@ app.layout = html.Div([
         children=[
             html.Ol([
                 html.Li(children=[html.A(href='#data-exploration', children=["Eksploracja danych"])]),
+                html.Ol(children=[
+                    html.Li(children=[html.A(href='#pie-charts', children=["Dwuwartościowe cechy działalności a jej kontynuowanie"])]),
+                    html.Li(children=[html.A(href='#by-month', children=["Działalności kontynuowane i niekontynuowane w rozłożeniu na miesiące rozpoczęcia działalności"])])
+                ]),
                 html.Li(children=[html.A(href='#model-features', children=["Właściwości modelu"])]),
             ])
         ]
@@ -26,9 +30,9 @@ app.layout = html.Div([
     }),
     html.Div(style={'float': 'left', 'width': '90%'},
              children=[
-                 html.H2("Eksploracja danych", id='data-exploration'),
+                 html.H1("Eksploracja danych", id='data-exploration'),
                  exploration_div,
-                 html.H2("Właściwości modelu", id='model-features', style={'float': 'left', 'width': '100%'}),
+                 html.H1("Właściwości modelu", id='model-features', style={'float': 'left', 'width': '100%'}),
                  model_div
              ])
     # html.Button('exploration', id='exploration_button', n_clicks=0),

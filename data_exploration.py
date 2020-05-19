@@ -41,8 +41,8 @@ fig = px.choropleth_mapbox(cursor.get_target_per_voivodeship(),
                            )
 
 fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0},
-                  height=700,
-                  width=900,
+                  height=600,
+                  width=750,
                   autosize=True,
                   clickmode='event+select',
                   plot_bgcolor=bg_color,
@@ -51,12 +51,18 @@ fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0},
 html_elements.append(html.Div([
     # sex
     html.Div([
-        dcc.Graph(id='map', figure=fig, style={'float': 'left', 'width': '50%', 'height': 800}),
+        html.H2('Dwuwartościowe cechy działalności a jej kontynuowanie',
+                id='pie-charts',
+                style={'float': 'left', 'width': '100%'}),
+        dcc.Graph(id='map', figure=fig, style={'float': 'left', 'width': '40%', 'height': 800}),
         dcc.Graph(id='map_pie_sex', style={'float': 'left', 'width': '25%', 'height': 400}),
         dcc.Graph(id='map_pie_citizenship', style={'float': 'left', 'width': '25%', 'height': 400}),
         dcc.Graph(id='map_pie_shareholder', style={'float': 'left', 'width': '25%', 'height': 400}),
         dcc.Graph(id='map_pie_has_info', style={'float': 'left', 'width': '25%', 'height': 400}),
-        dcc.Graph(id='business_by_month', style={'float': 'left', 'width': '50%', 'height': 400})
+        html.H2('Działalności kontynuowane i niekontynuowane w rozłożeniu na miesiące rozpoczęcia działalności',
+                id='by-month',
+                style={'float': 'left', 'width': '100%'}),
+        dcc.Graph(id='business_by_month', style={'float': 'left', 'width': '100%', 'height': 400})
     ])]))
 
 
