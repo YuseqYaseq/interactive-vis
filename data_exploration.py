@@ -66,9 +66,18 @@ html_elements.append(html.Div([
                 id='by-month',
                 style={'float': 'left', 'width': '100%'}),
         dcc.Graph(id='business_by_month', style={'float': 'left', 'width': '100%', 'height': 400}),
-        dcc.Graph(id='terminated_by_sections', style={'float': 'left', 'width': '50%', 'height': 400}),
-        dcc.Graph(id='terminated_by_classes', style={'float': 'left', 'width': '50%', 'height': 400}),
-        dcc.Graph(id='terminated_by_sectionName', style={'float': 'left', 'width': '50%', 'height': 400}),
+        html.H2('Procent firm, które wstrzymają działalność w zależności od posiadanej ilości sekcji PKD',
+                id='by-sectionCount',
+                style={'float': 'left', 'width': '100%'}),
+        dcc.Graph(id='terminated_by_sections', style={'float': 'left', 'width': '100%', 'height': 400}),
+        html.H2('Procent firm, które wstrzymają działalność w zależności od nazw sekcji PKD',
+                id='by-sectionName',
+                style={'float': 'left', 'width': '100%'}),
+        dcc.Graph(id='terminated_by_sectionName', style={'float': 'left', 'width': '100%', 'height': 600}),
+        html.H2('Procent firm, które wstrzymają działalność w zależności od posiadanej ilości klas PKD',
+                id='by-classesCount',
+                style={'float': 'left', 'width': '100%'}),
+        dcc.Graph(id='terminated_by_classes', style={'float': 'left', 'width': '100%', 'height': 400}),
     ])]))
 
 
@@ -117,7 +126,7 @@ def get_terminated_byNumberOfUniqueSections_barchart_fig(selected_data):
     
     values = cursor.get_terminated_byNumberOfUniqueSections(selected_voivodeships)
     fig = go.Figure(data=[
-        go.Bar(name='Procent firm, które wstrzymały działalność', x=values.index.values, y=values, marker_color=discrete_color_sequence[0]),
+        go.Bar(name='Procent firm, które wstrzymają działalność', x=values.index.values, y=values, marker_color=discrete_color_sequence[0]),
     ])
     fig.update_layout(margin={"r": 50, "t": 50, "l": 50, "b": 50},
                       height=300,
@@ -135,7 +144,7 @@ def get_terminated_bySectionName_barchart_fig(selected_data):
     
     values = cursor.get_terminated_bySectionName(selected_voivodeships)
     fig = go.Figure(data=[
-        go.Bar(name='Procent firm, które wstrzymały działalność', x=values.index.values, y=values, marker_color=discrete_color_sequence[0]),
+        go.Bar(name='Procent firm, które wstrzymają działalność', x=values.index.values, y=values, marker_color=discrete_color_sequence[0]),
     ])
     fig.update_layout(margin={"r": 50, "t": 50, "l": 50, "b": 50},
                       height=300,
@@ -160,6 +169,8 @@ def get_terminated_byNumberOfUniqueClasses_scatter_fig(selected_data):
                       font=font_settings)
     fig.update_traces(marker=dict(size=12, line=dict(width=3)),
                                                selector=dict(mode='markers'))
+    fig.update_xaxes(title_text='Liczba unikatowych klas PKD')
+    fig.update_yaxes(title_text='Procent firm, które wstrzymają działalność')
     return fig
 
 
