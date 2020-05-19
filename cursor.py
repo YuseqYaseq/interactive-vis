@@ -150,6 +150,16 @@ class Cursor:
         ret['MainAddressVoivodeship'] = ret.index
         return ret
 
+    def get_subset(self, **kwargs):
+        variable_value = ["{}=='{}'".format(variable, value) for variable, value in kwargs.items()]
+        query = " and ".join(variable_value)
+        return self.df.query(query)
+
+    def get_subset_summary(self, **kwargs):
+        subset = self.get_subset(**kwargs)
+        n_failed = subset["Target"].mean()
+        return n_failed, len(subset.index)
+
     def group_by_county(self):
         return self.df.groupby(['MainAddressVoivodeship', 'MainAddressCounty']).size().unstack(fill_value=0)
 
