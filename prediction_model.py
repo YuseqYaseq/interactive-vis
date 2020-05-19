@@ -127,6 +127,7 @@ def add():
             dcc.Graph(id='map', figure=fig, style={'float': 'left', 'width': '50%', 'height': 1200}),
             dcc.Graph(id='business_by_month', style={'float': 'left', 'width': '50%', 'height': 400}),
             dcc.Graph(id='terminated_by_sections', style={'float': 'left', 'width': '50%', 'height': 400}),
+            dcc.Graph(id='terminated_by_classes', style={'float': 'left', 'width': '50%', 'height': 400}),
             dcc.Graph(id='map_pie_sex', style={'float': 'left', 'width': '25%', 'height': 400}),
             dcc.Graph(id='map_pie_citizenship', style={'float': 'left', 'width': '25%', 'height': 400}),
             dcc.Graph(id='map_pie_shareholder', style={'float': 'left', 'width': '25%', 'height': 400}),
@@ -188,6 +189,23 @@ def get_terminated_byNumberOfUniqueSections_barchart_fig(selected_data):
 
     return fig
 
+def get_terminated_byNumberOfUniqueClasses_scatter_fig(selected_data):
+    if selected_data is None:
+        selected_voivodeships = voivodeships
+    else:
+        selected_voivodeships = [elem['location'] for elem in selected_data['points']]
+    
+    values = cursor.get_terminated_byNumberOfUniqueClasses(selected_voivodeships)
+    fig = px.scatter(values, y="NoOfUniquePKDClasses", x=values.index, color_discrete_sequence=discrete_color_sequence)
+    fig.update_layout(margin={"r": 50, "t": 50, "l": 50, "b": 50},
+                      height=300,
+                      plot_bgcolor=bg_color,
+                      paper_bgcolor=bg_color,
+                      font=font_settings)
+    fig.update_traces(marker=dict(size=12, line=dict(width=3)),
+                                               selector=dict(mode='markers'))
+    return fig
+
 @app.callback(
     [Output('map_pie_sex', 'figure'),
      Output('map_pie_citizenship', 'figure'),
@@ -195,7 +213,8 @@ def get_terminated_byNumberOfUniqueSections_barchart_fig(selected_data):
      Output('map_pie_licence', 'figure'),
      Output('map_pie_has_info', 'figure'),
      Output('business_by_month', 'figure'),
-     Output('terminated_by_sections', 'figure')],
+     Output('terminated_by_sections', 'figure'),
+     Output('terminated_by_classes', 'figure')],
     [Input('map', 'selectedData')])
 def display_selected_data(selectedData):
     return get_map_piechart_fig(selectedData,
@@ -231,7 +250,8 @@ def display_selected_data(selectedData):
                                  'False_NoInfo': 'Niewypełnione dane, 0'},
                                 'Odsetek przedsiębiorstw z wypełnionymi danymi kontaktowymi'), \
            get_business_by_month_barchart_fig(selectedData), \
-           get_terminated_byNumberOfUniqueSections_barchart_fig(selectedData)
+           get_terminated_byNumberOfUniqueSections_barchart_fig(selectedData), \
+           get_terminated_byNumberOfUniqueClasses_scatter_fig(selectedData)
 
 
 #########

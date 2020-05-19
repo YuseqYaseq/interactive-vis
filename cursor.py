@@ -166,6 +166,22 @@ class Cursor:
 
         return terminatedPkdSections.divide(allPkdSections).fillna(0)
 
+    def get_terminated_byNumberOfUniqueClasses(self, voivod_value):
+        voivod_filter = []
+        if voivod_value is None:
+            voivod_value = voivodeships
+        for voivod in voivod_value:
+            s = "MainAddressVoivodeship == \"%s\"" % (voivod)
+            voivod_filter.append(s)
+
+        voivod_filter = " | ".join(voivod_filter)
+        filtered_data = self.df.query(voivod_filter)
+        terminated = filtered_data[self.df.Target==1]
+        terminatedPkdClasses = terminated["NoOfUniquePKDClasses"].value_counts().sort_index()
+        allPkdClasses = filtered_data["NoOfUniquePKDClasses"].value_counts().sort_index()
+
+        return terminatedPkdClasses.divide(allPkdClasses).fillna(0)
+
     def get_subset(self, **kwargs):
         variable_value = ["{}=='{}'".format(variable, value) for variable, value in kwargs.items()]
         query = " and ".join(variable_value)
