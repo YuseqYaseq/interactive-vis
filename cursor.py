@@ -25,6 +25,8 @@ class Cursor:
 
     def __init__(self):
         self.df = pd.read_csv('data/ceidg_data_classif.csv', nrows=1000)
+        self.sections = pd.read_csv('data/sections.csv')
+
         self.df['MainAddressVoivodeship'] = self.df['MainAddressVoivodeship'].map(clean_voivodeships)
 
         with open('data/poland_geo.json', 'r', encoding='utf-8') as file:
@@ -181,6 +183,23 @@ class Cursor:
         allPkdClasses = filtered_data["NoOfUniquePKDClasses"].value_counts().sort_index()
 
         return terminatedPkdClasses.divide(allPkdClasses).fillna(0)
+
+    def get_terminated_bySectionName(self, voivod_value):
+        voivod_filter = []
+        if voivod_value is None:
+            voivod_value = voivodeships
+        for voivod in voivod_value:
+            s = "MainAddressVoivodeship == \"%s\"" % (voivod)
+            voivod_filter.append(s)
+
+        voivod_filter = " | ".join(voivod_filter)
+        filtered_data = self.df.query(voivod_filter)
+
+        terminated = filtered_data[self.df.Target==1]
+        allcount  = filtered_data.set_index('PKDMainSection').join(self.sections.set_index('pkdCode'))['section'].value_counts().rename_axis('pkdCode')
+        
+        terminatedRatio = terminated.set_index('PKDMainSection').join(self.sections.set_index('pkdCode'))['section'].value_counts().divide(allcount)
+        return terminatedRatio
 
     def get_subset(self, **kwargs):
         variable_value = ["{}=='{}'".format(variable, value) for variable, value in kwargs.items()]

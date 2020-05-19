@@ -68,6 +68,7 @@ html_elements.append(html.Div([
         dcc.Graph(id='business_by_month', style={'float': 'left', 'width': '100%', 'height': 400}),
         dcc.Graph(id='terminated_by_sections', style={'float': 'left', 'width': '50%', 'height': 400}),
         dcc.Graph(id='terminated_by_classes', style={'float': 'left', 'width': '50%', 'height': 400}),
+        dcc.Graph(id='terminated_by_sectionName', style={'float': 'left', 'width': '50%', 'height': 400}),
     ])]))
 
 
@@ -101,7 +102,7 @@ def get_business_by_month_barchart_fig(selected_data):
                marker_color=discrete_color_sequence[1])
     ])
     fig.update_layout(margin={"r": 50, "t": 50, "l": 50, "b": 50},
-                      height=200,
+                      height=300,
                       plot_bgcolor=bg_color,
                       paper_bgcolor=bg_color,
                       font=font_settings, )
@@ -115,6 +116,24 @@ def get_terminated_byNumberOfUniqueSections_barchart_fig(selected_data):
         selected_voivodeships = [elem['location'] for elem in selected_data['points']]
     
     values = cursor.get_terminated_byNumberOfUniqueSections(selected_voivodeships)
+    fig = go.Figure(data=[
+        go.Bar(name='Procent firm, które wstrzymały działalność', x=values.index.values, y=values, marker_color=discrete_color_sequence[0]),
+    ])
+    fig.update_layout(margin={"r": 50, "t": 50, "l": 50, "b": 50},
+                      height=300,
+                      plot_bgcolor=bg_color,
+                      paper_bgcolor=bg_color,
+                      font=font_settings,)
+
+    return fig
+
+def get_terminated_bySectionName_barchart_fig(selected_data):
+    if selected_data is None:
+        selected_voivodeships = voivodeships
+    else:
+        selected_voivodeships = [elem['location'] for elem in selected_data['points']]
+
+    values = cursor.get_terminated_bySectionName(selected_voivodeships)
     fig = go.Figure(data=[
         go.Bar(name='Procent firm, które wstrzymały działalność', x=values.index.values, y=values, marker_color=discrete_color_sequence[0]),
     ])
@@ -152,7 +171,8 @@ def get_terminated_byNumberOfUniqueClasses_scatter_fig(selected_data):
      Output('map_pie_has_info', 'figure'),
      Output('business_by_month', 'figure'),
      Output('terminated_by_sections', 'figure'),
-     Output('terminated_by_classes', 'figure')],
+     Output('terminated_by_classes', 'figure'),
+     Output('terminated_by_sectionName', 'figure')],
     [Input('map', 'selectedData')])
 def display_selected_data(selectedData):
     return get_map_piechart_fig(selectedData,
@@ -189,4 +209,5 @@ def display_selected_data(selectedData):
                                 'Odsetek przedsiębiorstw z wypełnionymi danymi kontaktowymi'), \
            get_business_by_month_barchart_fig(selectedData), \
            get_terminated_byNumberOfUniqueSections_barchart_fig(selectedData), \
-           get_terminated_byNumberOfUniqueClasses_scatter_fig(selectedData)
+           get_terminated_byNumberOfUniqueClasses_scatter_fig(selectedData), \
+           get_terminated_bySectionName_barchart_fig(selectedData)
