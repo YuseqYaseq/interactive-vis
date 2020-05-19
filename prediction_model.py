@@ -14,6 +14,13 @@ from cursor import cursor, voivodeships
 
 html_elements = []
 
+#bg_color = '#F9DEC9'
+bg_color = '#C2EABD'
+font_settings = {'color': '#000000',
+                 'size': 10}
+continous_color_sequence = 'Fall'
+discrete_color_sequence = ['#D4AA7D', '#967D69', '#92B9BD', '#272727']
+
 
 def create_table(array):
     return html.Table(
@@ -96,7 +103,7 @@ def add():
                                geojson=cursor.get_map(),
                                locations='MainAddressVoivodeship', color=True,
                                featureidkey='properties.name',
-                               color_continuous_scale="Viridis",
+                               color_continuous_scale=continous_color_sequence,
                                # range_color=(0, 12),
                                mapbox_style="carto-positron",
                                zoom=5.5, center={"lat": 52.11, "lon": 19.42},
@@ -109,7 +116,9 @@ def add():
                       height=700,
                       width=1000,
                       autosize=True,
-                      clickmode='event+select')
+                      clickmode='event+select',
+                      plot_bgcolor=bg_color,
+                      paper_bgcolor=bg_color)
 
     ############
     html_elements.append(html.Div([
@@ -132,22 +141,30 @@ def get_map_piechart_fig(selectedData, map_data, pie_names, title):
     values = map_data[map_data['MainAddressVoivodeship'].isin(selected_voivodeships)]
     values = [values[column].sum() for column in map_data.columns[:-1]]
     names = [pie_names[column] for column in map_data.columns[:-1]]
-    fig = px.pie(names=names, values=values, title=title)
+    fig = px.pie(names=names, values=values, title=title, color_discrete_sequence=discrete_color_sequence)
     fig.update_layout(margin={"r": 50, "t": 50, "l": 50, "b": 50},
-                      height=300)
+                      height=300,
+                      plot_bgcolor=bg_color,
+                      paper_bgcolor=bg_color,
+                      font=font_settings)
     return fig
 
+
 def get_business_by_month_barchart_fig(selected_data):
-    print(selected_data)
     if selected_data is None:
         selected_voivodeships = voivodeships
     else:
         selected_voivodeships = [elem['location'] for elem in selected_data['points']]
     values = cursor.get_target_by_month_and_voivod(None, selected_voivodeships)
     fig = go.Figure(data=[
-        go.Bar(name='Kontynuowane', x=values[0].index.values, y=values[0].values),
-        go.Bar(name='Niekontynuowane', x=values[1].index.values, y=values[1].values)
+        go.Bar(name='Kontynuowane', x=values[0].index.values, y=values[0].values, marker_color=discrete_color_sequence[0]),
+        go.Bar(name='Niekontynuowane', x=values[1].index.values, y=values[1].values, marker_color=discrete_color_sequence[1])
     ])
+    fig.update_layout(margin={"r": 50, "t": 50, "l": 50, "b": 50},
+                      height=300,
+                      plot_bgcolor=bg_color,
+                      paper_bgcolor=bg_color,
+                      font=font_settings,)
 
     return fig
 
