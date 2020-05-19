@@ -59,7 +59,7 @@ map_data_sex = cursor.get_target_per_category_voivodeship('Sex')
 map_data_citizenship = cursor.get_target_per_category_voivodeship('HasPolishCitizenship')
 map_data_shareholder = cursor.get_target_per_category_voivodeship('ShareholderInOtherCompanies')
 map_data_updated_info = cursor.get_target_per_updated_info_voivodeship()
-
+map_data_licence = cursor.get_target_per_category_voivodeship("HasLicences")
 
 def add():
     # confusion matrix
@@ -126,9 +126,11 @@ def add():
         html.Div([
             dcc.Graph(id='map', figure=fig, style={'float': 'left', 'width': '50%', 'height': 1200}),
             dcc.Graph(id='business_by_month', style={'float': 'left', 'width': '50%', 'height': 400}),
+            dcc.Graph(id='terminated_by_sections', style={'float': 'left', 'width': '50%', 'height': 400}),
             dcc.Graph(id='map_pie_sex', style={'float': 'left', 'width': '25%', 'height': 400}),
             dcc.Graph(id='map_pie_citizenship', style={'float': 'left', 'width': '25%', 'height': 400}),
             dcc.Graph(id='map_pie_shareholder', style={'float': 'left', 'width': '25%', 'height': 400}),
+            dcc.Graph(id='map_pie_licence', style={'float': 'left', 'width': '25%', 'height': 400}),
             dcc.Graph(id='map_pie_has_info', style={'float': 'left', 'width': '25%', 'height': 400})
         ])]))
 
@@ -168,12 +170,32 @@ def get_business_by_month_barchart_fig(selected_data):
 
     return fig
 
+def get_terminated_byNumberOfUniqueSections_barchart_fig(selected_data):
+    if selected_data is None:
+        selected_voivodeships = voivodeships
+    else:
+        selected_voivodeships = [elem['location'] for elem in selected_data['points']]
+    
+    values = cursor.get_terminated_byNumberOfUniqueSections(selected_voivodeships)
+    fig = go.Figure(data=[
+        go.Bar(name='Procent firm, które wstrzymały działalność', x=values.index.values, y=values, marker_color=discrete_color_sequence[0]),
+    ])
+    fig.update_layout(margin={"r": 50, "t": 50, "l": 50, "b": 50},
+                      height=300,
+                      plot_bgcolor=bg_color,
+                      paper_bgcolor=bg_color,
+                      font=font_settings,)
+
+    return fig
+
 @app.callback(
     [Output('map_pie_sex', 'figure'),
      Output('map_pie_citizenship', 'figure'),
      Output('map_pie_shareholder', 'figure'),
+     Output('map_pie_licence', 'figure'),
      Output('map_pie_has_info', 'figure'),
-     Output('business_by_month', 'figure')],
+     Output('business_by_month', 'figure'),
+     Output('terminated_by_sections', 'figure')],
     [Input('map', 'selectedData')])
 def display_selected_data(selectedData):
     return get_map_piechart_fig(selectedData,
@@ -195,13 +217,21 @@ def display_selected_data(selectedData):
                                  'False_False': 'Nieudziałowiec, 0'},
                                 'Odsetek udziałowców w innych przedsiębiorstwach'), \
            get_map_piechart_fig(selectedData,
+                                map_data_licence,
+                                {'True_True': 'Posiada licencję, 1',
+                                 'True_False': 'Nie posiada licencji, 1',
+                                 'False_True': 'Posiada licencję, 0',
+                                 'False_False': 'Nie posiada licencji, 0'},
+                                ' Odsetek firm posiadających licencję'), \
+           get_map_piechart_fig(selectedData,
                                 map_data_updated_info,
                                 {'True_HasInfo': 'Wypełnione dane, 1',
                                  'False_HasInfo': 'Wypełnione dane, 0',
                                  'True_NoInfo': 'Niewypełnione dane, 1',
                                  'False_NoInfo': 'Niewypełnione dane, 0'},
                                 'Odsetek przedsiębiorstw z wypełnionymi danymi kontaktowymi'), \
-           get_business_by_month_barchart_fig(selectedData)
+           get_business_by_month_barchart_fig(selectedData), \
+           get_terminated_byNumberOfUniqueSections_barchart_fig(selectedData)
 
 
 #########
