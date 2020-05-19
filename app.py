@@ -36,15 +36,3 @@ app.layout = html.Div([
     # exploration_div,
     # model_div
 ])
-
-
-@app.callback(
-    [dependencies.Output('exploration_div', 'hidden'), dependencies.Output('model_div', 'hidden')],
-    [dependencies.Input('exploration_button', 'n_clicks'), dependencies.Input('model_button', 'n_clicks')]
-)
-def update_page_exploration(e, m):
-    ctx = dash.callback_context
-    if not ctx.triggered or 'exploration_button' == ctx.triggered[0]['prop_id'].split('.')[0]:
-        return [False, True]
-
-    return [True, False]
